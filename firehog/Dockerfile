@@ -9,7 +9,11 @@ RUN cd /home/ncurses && ./configure && make install
 # Copy and compile lynx
 COPY lynx /home/lynx
 RUN cd /home/lynx && ./configure && make && make install
-# Copy copylynx script
-COPY copyall.sh /bin/copyall
-
-CMD "copyall"
+# Uninstall things
+RUN apt-get purge -y gcc g++ make
+# Remove ncurses and lynx
+RUN rm -rf /home/*
+# Link firehog to lynx
+COPY firehog.sh /bin/firehog
+# Starting command
+CMD ["firehog"]

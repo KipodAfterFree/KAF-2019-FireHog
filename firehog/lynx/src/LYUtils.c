@@ -1932,15 +1932,8 @@ PUBLIC void statusline ARGS1(
 }
 
 static char *novice_lines[] = {
-#ifndef NOVICE_LINE_TWO_A
-#define NOVICE_LINE_TWO_A	NOVICE_LINE_TWO
-#define NOVICE_LINE_TWO_B	""
-#define NOVICE_LINE_TWO_C	""
-#endif /* !NOVICE_LINE_TWO_A */
-  NOVICE_LINE_TWO_A,
-  NOVICE_LINE_TWO_B,
-  NOVICE_LINE_TWO_C,
-  ""
+    NOVICE_LINE_TWO,
+    ""
 };
 static int lineno = 0;
 
@@ -1962,7 +1955,7 @@ PUBLIC void noviceline ARGS1(
     move(LYlines-2,0);
     /* stop_reverse(); */
     clrtoeol();
-    addstr(NOVICE_LINE_ONE);
+    //addstr(NOVICE_LINE_ONE);
     clrtoeol();
 
 #if defined(DIRED_SUPPORT ) && defined(OK_OVERRIDE)
@@ -1971,10 +1964,8 @@ PUBLIC void noviceline ARGS1(
     else
 #endif /* DIRED_SUPPORT && OK_OVERRIDE */
 
-    if (LYUseNoviceLineTwo)
+    //sprintf(NOVICE_LINE_TWO);
 	addstr(NOVICE_LINE_TWO);
-    else
-	addstr((char *)novice_lines[lineno]);
 
 #ifdef NOTDEFINED
     if (is_www_index && more_flag) {

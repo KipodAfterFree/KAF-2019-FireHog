@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 docker build firehog -t firehog
-docker run --rm firehog
+docker run --rm -it firehog

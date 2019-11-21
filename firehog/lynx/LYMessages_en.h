@@ -112,16 +112,8 @@
 #define BAD_LINK_NUM_ENTERED "You have entered an invalid link number."
 #define SOURCE_HELP \
  "Currently viewing document source.  Press '\\' to return to rendered version."
-#define NOVICE_LINE_ONE \
- "  Arrow keys: Up and Down to move. Right to follow a link; Left to go back.  \n"
 #define NOVICE_LINE_TWO \
- " H)elp O)ptions P)rint G)o M)ain screen Q)uit /=search [delete]=history list \n"
-#define NOVICE_LINE_TWO_A \
- "  O)ther cmds  H)elp  K)eymap  G)oto  P)rint  M)ain screen  o)ptions  Q)uit  \n"
-#define NOVICE_LINE_TWO_B \
- "  O)ther cmds  B)ack  E)dit  D)ownload ^R)eload ^W)ipe screen  search doc: / \n"
-#define NOVICE_LINE_TWO_C \
- "  O)ther cmds  C)omment  History: <delete>  Bookmarks: V)iew, A)dd, R)emove  \n"
+ "\n O)ptions G)o Q)uit FireHog \n"
 #define FORM_NOVICELINE_ONE \
  "            Enter text into the field by typing on the keyboard              "
 #define FORM_NOVICELINE_TWO \

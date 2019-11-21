@@ -1211,14 +1211,14 @@
  *  		  have a good knowledge of the program
  */
 
-#define LYNX_NAME "Lynx"
+#define LYNX_NAME "FireHog"
 /* The strange-looking comments on the next line tell PRCS to replace
  * the version definition with the Project Version on checkout. Just
  * ignore it. - kw */
 /* $Format: "#define LYNX_VERSION \"$ProjectVersion$\""$ */
-#define LYNX_VERSION "2.8.1rel.2"
-#define LYNX_WWW_HOME "http://lynx.browser.org/"
-#define LYNX_WWW_DIST "http://www.slcc.edu/lynx/current/"
+#define LYNX_VERSION "1.0.0"
+#define LYNX_WWW_HOME ""
+#define LYNX_WWW_DIST ""
 #define LYNX_RELEASE TRUE
 /* $Format: "#define LYNX_DATE \"$ProjectDate$\""$ */
 #define LYNX_DATE "Tue, 27 Oct 1998 19:08:12 -0700"

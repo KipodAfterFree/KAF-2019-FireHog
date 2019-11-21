@@ -327,14 +327,13 @@ try_again:
 	  StrAllocCat(command, line);
       }
 
-      if (LYUserAgent && *LYUserAgent) {
-	  sprintf(line, "User-Agent: %s%c%c", LYUserAgent, CR, LF);
-      } else {
-	  sprintf(line, "User-Agent: %s/%s  libwww-FM/%s%c%c",
-		  HTAppName ? HTAppName : "unknown",
-		  HTAppVersion ? HTAppVersion : "0.0",
-		  HTLibraryVersion, CR, LF);
-      }
+      // Add Fire and Hedgehog headers
+      sprintf(line, "Fire: 0%c%c", CR, LF);
+      StrAllocCat(command, line);
+      sprintf(line, "Hedgehog: 0%c%c", CR, LF);
+      StrAllocCat(command, line);
+      // Force FireHog
+	  sprintf(line, "User-Agent: FireHog/1.0.0%c%c", CR, LF);
       StrAllocCat(command, line);
 
       if (personal_mail_address && !LYNoFromHeader) {

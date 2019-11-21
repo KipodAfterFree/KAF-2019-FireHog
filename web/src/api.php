@@ -10,7 +10,7 @@ function display($page)
 {
     if (verify($page)) {
         $link = map()->$page->link;
-        echo "<a href='http://www.youtube.com/watch?v=$link'>Great Video</a>\n";
+        echo "<a href='http://www.youtube.com/watch?v=$link'>A Video</a>\n";
         foreach (map()->$page->locations as $location) {
             $random = random(20);
             echo "<a href='?page=$location'>$random</a>\n";

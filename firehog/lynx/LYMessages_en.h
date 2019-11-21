@@ -113,7 +113,7 @@
 #define SOURCE_HELP \
  "Currently viewing document source.  Press '\\' to return to rendered version."
 #define NOVICE_LINE_TWO \
- "\n O)ptions G)o Q)uit FireHog \n"
+ "\n[FireHog] O)ptions G)o Q)uit\n"
 #define FORM_NOVICELINE_ONE \
  "            Enter text into the field by typing on the keyboard              "
 #define FORM_NOVICELINE_TWO \

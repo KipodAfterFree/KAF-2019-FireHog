@@ -1,6 +1,6 @@
 <?php
 
-const HEDGEHOG_DIRECTORY = __DIR__ . DIRECTORY_SEPARATOR . "private" . DIRECTORY_SEPARATOR . "hedgehogs";
+const HEDGEHOGS_DIRECTORY = __DIR__ . DIRECTORY_SEPARATOR . "private" . DIRECTORY_SEPARATOR . "hedgehogs";
 const MAP_FILE = __DIR__ . DIRECTORY_SEPARATOR . "private" . DIRECTORY_SEPARATOR . "map.json";
 
 // Compatibility with lynx 2.8.1 - duh
@@ -17,7 +17,7 @@ function display($page)
         }
     } else {
         $random = random(20);
-        echo "<a href=''>$random</a>\n";
+        echo "<a href='?'>$random</a>\n";
     }
 }
 
@@ -54,9 +54,12 @@ function verify_headers()
 
 function verify_hedgehog($headers)
 {
-    $belly = hash("sha256", load($headers[0])->belly);
-    $decrypted = openssl_decrypt(base64_decode($headers[1]), 'AES-256-CBC', hash("sha256", $headers[0]), OPENSSL_NO_PADDING, "FireHog//Browser");
-    return $belly === $decrypted;
+    if (hedgehog_exists($headers[0])) {
+        $belly = hash("sha256", hedgehog_load($headers[0])->belly);
+        $decrypted = openssl_decrypt(base64_decode($headers[1]), 'AES-256-CBC', hash("sha256", $headers[0]), OPENSSL_NO_PADDING, "FireHog//Browser");
+        return $belly === $decrypted;
+    }
+    return false;
 }
 
 function hedgehog_create($id)
@@ -64,30 +67,47 @@ function hedgehog_create($id)
     $hedgehog = new stdClass();
     $hedgehog->belly = "";
     $hedgehog->location = "start";
-    unload($id, $hedgehog);
+    hedgehog_unload($id, $hedgehog);
 }
 
 function hedgehog_feed($id, $water)
 {
-    $hedgehog = load($id);
+    $hedgehog = hedgehog_load($id);
     $hedgehog->belly .= $water;
-    unload($id, $hedgehog);
+    hedgehog_unload($id, $hedgehog);
 }
 
 function hedgehog_travel($id, $destination)
 {
-    $hedgehog = load($id);
+    $hedgehog = hedgehog_load($id);
     $map = map();
     if (isset($map->{$hedgehog->location}) && isset($map->$destination)) {
-        if (array_search($map->{$hedgehog->location}->locations, $destination) !== false ||
-            array_search($map->$destination->locations, $hedgehog->location) !== false ||
+        if (array_search($destination, $map->{$hedgehog->location}->locations) !== false ||
+            array_search($hedgehog->location, $map->$destination->locations) !== false ||
             $hedgehog->location === $destination) {
             $hedgehog->location = $destination;
-            unload($id, $map);
+            hedgehog_unload($id, $map);
             return true;
         }
     }
     return false;
+}
+
+function hedgehog_exists($id)
+{
+    if (preg_match("/^[a-z0-9]+$/", $id))
+        return file_exists(HEDGEHOGS_DIRECTORY . DIRECTORY_SEPARATOR . $id);
+    return false;
+}
+
+function hedgehog_load($id)
+{
+    return json_decode(file_get_contents(HEDGEHOGS_DIRECTORY . DIRECTORY_SEPARATOR . $id));
+}
+
+function hedgehog_unload($id, $database)
+{
+    file_put_contents(HEDGEHOGS_DIRECTORY . DIRECTORY_SEPARATOR . $id, json_encode($database));
 }
 
 function random($length)
@@ -97,21 +117,6 @@ function random($length)
         return $current . random($length - 1);
     }
     return "";
-}
-
-function exists($id)
-{
-    return file_exists(HEDGEHOG_DIRECTORY . DIRECTORY_SEPARATOR . $id);
-}
-
-function load($id)
-{
-    return json_decode(file_get_contents(HEDGEHOG_DIRECTORY . DIRECTORY_SEPARATOR . $id));
-}
-
-function unload($id, $database)
-{
-    file_put_contents(HEDGEHOG_DIRECTORY . DIRECTORY_SEPARATOR . $id, json_encode($database));
 }
 
 function map()

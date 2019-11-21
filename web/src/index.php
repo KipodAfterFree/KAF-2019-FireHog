@@ -13,9 +13,9 @@
         if(isset($_GET["page"])){
             display($_GET["page"]);
         }else{
-            $id = random(256);
+            $id = random(32);
             hedgehog_create($id);
-            display("start");
+            echo "<a href='?page=start'>Go</a>";
         }
         ?>
     </div>

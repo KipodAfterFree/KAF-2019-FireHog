@@ -163,7 +163,7 @@ try_again:
 
   if (!strncmp(url, "https", 5))
     {
-      HTAlert("This client does not contain support for HTTPS URLs.");
+      HTAlert("Boi, find yourself a nicer browser");
       status = HT_NOT_LOADED;
       goto done;
     }

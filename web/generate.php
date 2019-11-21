@@ -5,17 +5,18 @@ while (count($ids) > 0) {
     shuffle($ids);
     $id = random(20);
     $map->$id = new stdClass();
-    $map->$id->link = $ids[0];
+    $map->$id->link = array_pop($ids);
     $map->$id->locations = array();
 }
 
-
-
-function recursively()
-{
-    global $map, $ids;
-
+foreach ($map as $id => $content) {
+    $array = array_keys((array)$map);
+    shuffle($array);
+    for ($i = 0; $i < 10; $i++) {
+        array_push($content->locations, $array[$i]);
+    }
 }
+file_put_contents("src/private/map.json", json_encode($map));
 
 function random($length)
 {

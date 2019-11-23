@@ -8,7 +8,7 @@ COPY ncurses /home/ncurses
 RUN cd /home/ncurses && ./configure && make install
 # Copy and compile lynx
 COPY lynx /home/lynx
-RUN cd /home/lynx && ./configure && make && make install
+RUN cd /home/lynx && ./configure && make CFLAGS="-static" && make install
 # Uninstall things
 RUN apt-get purge -y gcc g++ make
 # Remove ncurses and lynx

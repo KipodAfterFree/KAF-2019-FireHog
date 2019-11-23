@@ -8,17 +8,19 @@ apache_setenv('no-gzip', '1');
 
 function display($page)
 {
+    $content = "";
     if (verify($page)) {
         $link = map()->$page->link;
-        echo "<a href='http://www.youtube.com/watch?v=$link'>A Video</a>\n";
+        $content .= "<a href='http://www.youtube.com/watch?v=$link'>A Video</a>\n";
         foreach (map()->$page->locations as $location) {
             $random = random(20);
-            echo "<a href='?page=$location'>$random</a>\n";
+            $content .= "<a href='?page=$location'>$random</a>\n";
         }
     } else {
         $random = random(20);
-        echo "<a href='?'>$random</a>\n";
+        $content .= "<a href='?'>$random</a>\n";
     }
+    return $content;
 }
 
 function verify($page)
@@ -29,7 +31,8 @@ function verify($page)
             if (hedgehog_travel($headers[0], $page)) {
                 $water = random(128);
                 hedgehog_feed($headers[0], $water);
-                header("Water: " . $water);
+                header("Water: " . $water, true);
+                header("Hedgehog: " . $headers[0], true);
                 return true;
             }
         }
@@ -55,9 +58,7 @@ function verify_headers()
 function verify_hedgehog($headers)
 {
     if (hedgehog_exists($headers[0])) {
-        $belly = hash("sha256", hedgehog_load($headers[0])->belly);
-        $decrypted = openssl_decrypt(base64_decode($headers[1]), 'AES-256-CBC', hash("sha256", $headers[0]), OPENSSL_NO_PADDING, "FireHog//Browser");
-        return $belly === $decrypted;
+        return hedgehog_load($headers[0])->belly === $headers[1];
     }
     return false;
 }
@@ -80,13 +81,14 @@ function hedgehog_feed($id, $water)
 function hedgehog_travel($id, $destination)
 {
     $hedgehog = hedgehog_load($id);
+    $current = $hedgehog->location;
     $map = map();
-    if (isset($map->{$hedgehog->location}) && isset($map->$destination)) {
-        if (array_search($destination, $map->{$hedgehog->location}->locations) !== false ||
-            array_search($hedgehog->location, $map->$destination->locations) !== false ||
-            $hedgehog->location === $destination) {
+    if (isset($map->$current) && isset($map->$destination)) {
+        if (in_array($destination, $map->$current->locations) ||
+            in_array($current, $map->$destination->locations) ||
+            $current === $destination) {
             $hedgehog->location = $destination;
-            hedgehog_unload($id, $map);
+            hedgehog_unload($id, $hedgehog);
             return true;
         }
     }
@@ -102,7 +104,9 @@ function hedgehog_exists($id)
 
 function hedgehog_load($id)
 {
-    return json_decode(file_get_contents(HEDGEHOGS_DIRECTORY . DIRECTORY_SEPARATOR . $id));
+    if (preg_match("/^[a-z0-9]+$/", $id))
+        return json_decode(file_get_contents(HEDGEHOGS_DIRECTORY . DIRECTORY_SEPARATOR . $id));
+    return new stdClass();
 }
 
 function hedgehog_unload($id, $database)

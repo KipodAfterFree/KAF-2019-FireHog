@@ -1467,13 +1467,6 @@ try_again:
 
 		sprintf(buf, WWW_INDEX_MESSAGE, key_for_func(LYK_INDEX_SEARCH));
 		_statusline(buf);
-	    } else if (more) {
-		if (user_mode == NOVICE_MODE)
-			_statusline(MORE);
-		else
-			_statusline(MOREHELP);
-	    } else {
-	       _statusline(HELP);
 	    }
 	} else {
 	   show_help = FALSE;

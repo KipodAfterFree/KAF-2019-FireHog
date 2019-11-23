@@ -1,34 +1,37 @@
-/*********************************************************************
-* Filename:   sha256.h
-* Author:     Brad Conte (brad AT bradconte.com)
-* Copyright:
-* Disclaimer: This code is presented "as is" without any guarantees.
-* Details:    Defines the API for the corresponding SHA1 implementation.
-*********************************************************************/
+#if !defined(SHA256_H_)
+#define SHA256_H_
 
-#ifndef SHA256_H
-#define SHA256_H
+#define USE_OPENSSL 0   /* We use the OpenSSL implementation for SHA-256 */
+                        /* (which is quite a bit faster than our portable */
+                        /* C version) */
 
-/*************************** HEADER FILES ***************************/
-#include <stddef.h>
+/* Length of a SHA256 hash */
+#define SHA256_LEN		32
 
-/****************************** MACROS ******************************/
-#define SHA256_BLOCK_SIZE 32            // SHA256 outputs a 32 byte digest
+#if USE_OPENSSL
 
-/**************************** DATA TYPES ****************************/
-typedef unsigned char BYTE;             // 8-bit byte
-typedef unsigned int  WORD;             // 32-bit word, change to "long" for 16-bit machines
+#include <openssl/sha.h>
 
+#else
+
+/* SHA256 context. */
 typedef struct {
-	BYTE data[64];
-	WORD datalen;
-	unsigned long long bitlen;
-	WORD state[8];
+  unsigned long int h[8];            /* state; this is in the CPU native format */
+  unsigned long Nl, Nh;              /* number of bits processed so far */
+  unsigned num;                      /* number of bytes within the below */
+                                     /* buffer */
+  unsigned char data[64];            /* input buffer.  This is in byte vector format */
 } SHA256_CTX;
 
-/*********************** FUNCTION DECLARATIONS **********************/
-void sha256_init(SHA256_CTX *ctx);
-void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len);
-void sha256_final(SHA256_CTX *ctx, BYTE hash[]);
+void SHA256_Init(SHA256_CTX *);  /* context */
 
-#endif   // SHA256_H
+void SHA256_Update(SHA256_CTX *, /* context */
+                  const void *, /* input block */ 
+                  unsigned int);/* length of input block */
+
+void SHA256_Final(unsigned char *,
+                 SHA256_CTX *);
+#endif
+
+#endif /* ifdef(SHA256_H_) */
+

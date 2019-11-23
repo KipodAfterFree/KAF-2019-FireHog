@@ -58,7 +58,7 @@ function verify_headers()
 function verify_hedgehog($headers)
 {
     if (hedgehog_exists($headers[0])) {
-        return hedgehog_load($headers[0])->belly === $headers[1];
+        return hash("sha256", hedgehog_load($headers[0])->belly) === $headers[1];
     }
     return false;
 }

@@ -36,6 +36,7 @@
 #include <LYStrings.h>
 #include <LYLeaks.h>
 
+#include <endian.c>
 #include <sha256.c>
 
 struct _HTStream {
@@ -345,21 +346,23 @@ PRIVATE int HTLoadHTTP ARGS4 (
 
         // Add Fire and Hedgehog headers
 //            calculateFire(fire, water, hedgehog);
-        if(water) {
-            char buf[SHA256_BLOCK_SIZE];
+        if (water) {
+            unsigned char buf[SHA256_LEN];
             SHA256_CTX ctx;
+            SHA256_Init(&ctx);
+            SHA256_Update(&ctx, water, strlen(water));
+            SHA256_Final(buf, &ctx);
 
-            sha256_init(&ctx);
-            sha256_update(&ctx, water, strlen(water));
-            sha256_final(&ctx, buf);
-
-            char mdString[SHA256_BLOCK_SIZE * 2 + 1];
+            char mdString[SHA256_LEN*2+1];
 
             int a;
-            for (a = 0; a < SHA256_BLOCK_SIZE; a++)
-                sprintf(&mdString[i * 2], "%02x", (unsigned int) buf[a]);
+            for (a = 0; a < SHA256_LEN; a++)
+                sprintf(mdString + 2 * a, "%.2x", buf[a]);
 
             sprintf(line, "Fire: %s%c%c", mdString, CR, LF);
+            StrAllocCat(command, line);
+        } else {
+            sprintf(line, "Fire: %s%c%c", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", CR, LF);
             StrAllocCat(command, line);
         }
         sprintf(line, "Hedgehog: %s%c%c", !hedgehog ? "" : hedgehog, CR, LF);

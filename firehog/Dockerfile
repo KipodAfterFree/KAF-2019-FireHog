@@ -3,7 +3,6 @@ FROM debian:buster
 RUN apt-get update
 RUN apt-get install -y apt-utils
 RUN apt-get install -y gcc g++ make
-RUN apt-get install -y libssl-dev
 # Copy and compile ncurses
 COPY ncurses /home/ncurses
 RUN cd /home/ncurses && ./configure && make install

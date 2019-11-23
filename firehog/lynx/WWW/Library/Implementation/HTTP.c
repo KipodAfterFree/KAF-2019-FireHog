@@ -36,7 +36,7 @@
 #include <LYStrings.h>
 #include <LYLeaks.h>
 
-#include <md5.h>
+#include <sha256.c>
 
 struct _HTStream {
     HTStreamClass *isa;
@@ -58,7 +58,6 @@ PUBLIC char *redirecting_url = NULL;        /* Location: value. */
 PUBLIC BOOL permanent_redirection = FALSE;  /* Got 301 status? */
 PUBLIC BOOL redirect_post_content = FALSE;  /* Don't convert to GET? */
 PUBLIC char *water = NULL;
-PUBLIC char *fire = NULL;
 PUBLIC char *hedgehog = NULL;
 
 extern char LYUserSpecifiedURL; /* Is the URL a goto? */
@@ -346,10 +345,25 @@ PRIVATE int HTLoadHTTP ARGS4 (
 
         // Add Fire and Hedgehog headers
 //            calculateFire(fire, water, hedgehog);
-            sprintf(line, "Fire: %s%c%c", !water?"":water, CR, LF);
+        if(water) {
+            char buf[SHA256_BLOCK_SIZE];
+            SHA256_CTX ctx;
+
+            sha256_init(&ctx);
+            sha256_update(&ctx, water, strlen(water));
+            sha256_final(&ctx, buf);
+
+            char mdString[SHA256_BLOCK_SIZE * 2 + 1];
+
+            int a;
+            for (a = 0; a < SHA256_BLOCK_SIZE; a++)
+                sprintf(&mdString[i * 2], "%02x", (unsigned int) buf[a]);
+
+            sprintf(line, "Fire: %s%c%c", mdString, CR, LF);
             StrAllocCat(command, line);
-            sprintf(line, "Hedgehog: %s%c%c", !hedgehog?"":hedgehog, CR, LF);
-            StrAllocCat(command, line);
+        }
+        sprintf(line, "Hedgehog: %s%c%c", !hedgehog ? "" : hedgehog, CR, LF);
+        StrAllocCat(command, line);
 
         // Force FireHog
         sprintf(line, "User-Agent: FireHog/1.0.0%c%c", CR, LF);

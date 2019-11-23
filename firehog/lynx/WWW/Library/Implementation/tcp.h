@@ -483,7 +483,7 @@ struct timeval {
 #endif /* HAVE_UNISTD_H */
 
 #ifdef HAVE_SYS_FILIO_H
-#include <sys/filio.h>
+//#include <sys/filio.h>
 #endif /* HAVE_SYS_FILIO_H */
 
 /*

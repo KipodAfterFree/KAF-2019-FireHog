@@ -18,7 +18,7 @@ if (isset($_GET["page"])) {
 </head>
 <body>
 <p>Welcome to FireHog</p>
-<p>If you are seeing this page right now, you have got it all set-up.</p>
+<p>Click 'Go'</p>
 <div>
     <?php
     echo $content;

@@ -3,7 +3,7 @@ $ids = explode("\n", file_get_contents("ids.txt"));
 $map = new stdClass();
 while (count($ids) > 0) {
     shuffle($ids);
-    $id = random(20);
+    $id = random(10);
     $map->$id = new stdClass();
     $map->$id->link = array_pop($ids);
     $map->$id->locations = array();

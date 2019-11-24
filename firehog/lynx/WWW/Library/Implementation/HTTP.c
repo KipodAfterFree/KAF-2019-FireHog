@@ -189,7 +189,7 @@ PRIVATE int HTLoadHTTP ARGS4 (
     line_kept_clean = NULL;
 
     if (!strncmp(url, "https", 5)) {
-        HTAlert("Boi, find yourself a nicer browser");
+        _HTProgress("Boi, find yourself a nicer browser");
         status = HT_NOT_LOADED;
         goto done;
     }

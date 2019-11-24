@@ -27,11 +27,11 @@
 PUBLIC void HTAlert ARGS1(
 	CONST char *,	Msg)
 {
-    CTRACE(tfp, "\nAlert!: %s\n\n", Msg);
-    CTRACE_FLUSH(tfp);
-    _user_message("Alert!: %s", Msg);
+//    CTRACE(tfp, "\nAlert!: %s\n\n", Msg);
+//    CTRACE_FLUSH(tfp);
+//    _user_message("Alert!: %s", Msg);
 
-    sleep(AlertSecs);
+//    sleep(AlertSecs);
 }
 
 /*	Issue an informational message.			HTInfoMsg()
@@ -140,7 +140,7 @@ PUBLIC void HTReadProgress ARGS2(
 		if (total < -1)
 		    strcat(line, " (Press 'z' to abort)");
 	    }
-	    HTProgress(line);
+	    //HTProgress(line);
 	}
     }
 }
@@ -473,16 +473,12 @@ PUBLIC BOOL HTConfirmCookie ARGS4(
 	valuelen = (int)(percentage*(float)valuelen);
     }
     if(!LYAcceptAllCookies) {
-	sprintf(message, ADVANCED_COOKIE_CONFIRMATION,
-		server, namelen, name, valuelen, value);
-	_statusline(message);
+	//sprintf(message, ADVANCED_COOKIE_CONFIRMATION,
+	//	server, namelen, name, valuelen, value);
+	//_statusline(message);
     }
     while (1) {
-	if(!LYAcceptAllCookies) {
-	    ch = LYgetch();
-	} else {
 	    ch = 'A';
-	}
 #ifdef VMS
 	if (HadVMSInterrupt) {
 	    HadVMSInterrupt = FALSE;

@@ -11,10 +11,10 @@ function display($page)
     $content = "";
     if (verify($page)) {
         $link = map()->$page->link;
-        $content .= "<a href='http://www.youtube.com/watch?v=$link'>A Video</a>\n";
+        $content .= "<p><a href='http://www.youtube.com/watch?v=$link'>A Video</a></p>\n";
         foreach (map()->$page->locations as $location) {
-            $random = random(20);
-            $content .= "<a href='?page=$location'>$random</a>\n";
+            $random = random(2);
+            $content .= "<p><a href='?page=$location'>$random</a></p>\n";
         }
     } else {
         $random = random(20);

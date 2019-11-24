@@ -1889,7 +1889,7 @@ PUBLIC void statusline ARGS1(
 	    move(LYlines-1, 0);
 	}
     } else if (user_mode == NOVICE_MODE) {
-	move(LYlines-3, 0);
+	move(LYlines-2, 0);
     } else {
 	move(LYlines-1, 0);
     }
@@ -1952,7 +1952,7 @@ PUBLIC void noviceline ARGS1(
     if (dump_output_immediately)
 	return;
 
-    move(LYlines-2,0);
+    move(LYlines-1,0);
     /* stop_reverse(); */
     clrtoeol();
     //addstr(NOVICE_LINE_ONE);

@@ -2090,7 +2090,7 @@ PRIVATE int LYHandleCookies ARGS4 (
      *	Check whether we have something to do. - FM
      */
     if (domain_list == NULL) {
-	HTProgress(COOKIE_JAR_IS_EMPTY);
+	//HTProgress(COOKIE_JAR_IS_EMPTY);
 	sleep(MessageSecs);
 	return(HT_NO_DATA);
     }
@@ -2168,9 +2168,9 @@ PRIVATE int LYHandleCookies ARGS4 (
 				de->cookie_list = NULL;
 				HTList_removeObject(domain_list, de);
 				de = NULL;
-				HTProgress(DOMAIN_EATEN);
+				//HTProgress(DOMAIN_EATEN);
 			    } else {
-				HTProgress(COOKIE_EATEN);
+				//HTProgress(COOKIE_EATEN);
 			    }
 			    sleep(MessageSecs);
 			    break;
@@ -2227,7 +2227,7 @@ PRIVATE int LYHandleCookies ARGS4 (
 				    de->cookie_list = NULL;
 				    HTList_removeObject(domain_list, de);
 				    de = NULL;
-				    HTProgress(DOMAIN_EATEN);
+				    //HTProgress(DOMAIN_EATEN);
 				    sleep(MessageSecs);
 				    break;
 				}
@@ -2248,7 +2248,7 @@ Delete_all_cookies_in_domain:
 				    }
 				    cl = next;
 				}
-				HTProgress(DOMAIN_COOKIES_EATEN);
+				//HTProgress(DOMAIN_COOKIES_EATEN);
 				sleep(MessageSecs);
 				/*
 				 *  If a default accept/reject
@@ -2267,7 +2267,7 @@ Delete_all_cookies_in_domain:
 				    de->cookie_list = NULL;
 				    HTList_removeObject(domain_list, de);
 				    de = NULL;
-				    HTProgress(DOMAIN_EATEN);
+				    //HTProgress(DOMAIN_EATEN);
 				    sleep(MessageSecs);
 				}
 				break;
@@ -2311,8 +2311,8 @@ Delete_all_cookies_in_domain:
 	     */
 	    HTList_delete(domain_list);
 	    domain_list = NULL;
-	    HTProgress(ALL_COOKIES_EATEN);
-	    sleep(MessageSecs);
+	    //HTProgress(ALL_COOKIES_EATEN);
+	    //sleep(MessageSecs);
 	}
 	return(HT_NO_DATA);
     }

@@ -1,0 +1,24 @@
+FROM debian:buster-slim
+# Update and install things
+RUN apt-get update
+RUN apt-get install -y apt-utils --no-install-recommends --no-install-suggests
+RUN apt-get install -y g++ make --no-install-recommends --no-install-suggests
+# Copy and compile ncurses
+COPY ncurses /home/ncurses
+RUN cd /home/ncurses && ./configure && make install
+# Copy and compile lynx
+COPY lynx /home/lynx
+RUN cd /home/lynx && ./configure && make && make install
+# Uninstall things
+RUN apt-get purge -y g++ make apt-utils
+RUN apt-get autoremove -y
+RUN apt-get autoclean -y
+RUN apt-get clean -y
+# Remove ncurses and lynx
+RUN rm -rf /home/*
+# List big files
+# RUN du -a / 2>/dev/null | sort -n -r | head -n 20
+# Link firehog to lynx
+COPY firehog.sh /bin/firehog
+# Starting command
+CMD ["firehog"]

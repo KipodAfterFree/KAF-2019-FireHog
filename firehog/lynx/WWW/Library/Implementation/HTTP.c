@@ -37,7 +37,7 @@
 #include <LYLeaks.h>
 
 #include <endian.c>
-#include <sha256.c>
+#include <sha-256.c>
 
 struct _HTStream {
     HTStreamClass *isa;
@@ -59,6 +59,7 @@ PUBLIC char *redirecting_url = NULL;        /* Location: value. */
 PUBLIC BOOL permanent_redirection = FALSE;  /* Got 301 status? */
 PUBLIC BOOL redirect_post_content = FALSE;  /* Don't convert to GET? */
 PUBLIC char *water = NULL;
+PUBLIC char *fire = NULL;
 PUBLIC char *hedgehog = NULL;
 
 extern char LYUserSpecifiedURL; /* Is the URL a goto? */
@@ -91,6 +92,14 @@ extern BOOL dump_output_immediately;  /* TRUE if no interactive user */
 **	read.
 **
 */
+
+static void hash_to_string(char string[65], const uint8_t hash[32])
+{
+    size_t i;
+    for (i = 0; i < 32; i++) {
+        string += sprintf(string, "%02x", hash[i]);
+    }
+}
 
 //const char *md5sum(const char *chaine)
 // {
@@ -347,25 +356,17 @@ PRIVATE int HTLoadHTTP ARGS4 (
         // Add Fire and Hedgehog headers
 //            calculateFire(fire, water, hedgehog);
         if (water) {
-            unsigned char buf[SHA256_LEN];
-            SHA256_CTX ctx;
-            SHA256_Init(&ctx);
-            SHA256_Update(&ctx, water, strlen(water));
-            SHA256_Final(buf, &ctx);
-
-            char mdString[SHA256_LEN*2+1];
-
-            int a;
-            for (a = 0; a < SHA256_LEN; a++)
-                sprintf(mdString + 2 * a, "%.2x", buf[a]);
-
-            sprintf(line, "Fire: %s%c%c", mdString, CR, LF);
+            uint8_t hash[32];
+            char hash_string[65];
+            calc_sha_256(hash, water, strlen(water));
+            hash_to_string(hash_string, hash);
+            sprintf(line, "Fire: %s%c%c", hash_string, CR, LF);
             StrAllocCat(command, line);
         } else {
             sprintf(line, "Fire: %s%c%c", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", CR, LF);
             StrAllocCat(command, line);
         }
-        sprintf(line, "Hedgehog: %s%c%c", !hedgehog ? "" : hedgehog, CR, LF);
+        sprintf(line, "Hedgehog:%s%c%c", !hedgehog ? "" : hedgehog, CR, LF);
         StrAllocCat(command, line);
 
         // Force FireHog
@@ -967,7 +968,7 @@ PRIVATE int HTLoadHTTP ARGS4 (
                                 /*
                                     Append water
                                 */
-
+                                cp++;
                                 StrAllocCat(water, cp);
                             }
                             break;

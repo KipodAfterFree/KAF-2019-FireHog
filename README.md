@@ -29,6 +29,8 @@ Recursive search (crawler) over the given links.
 
 You can build the whole project by typing: `./export.sh` or run individual parts by running `./run-browser.sh` and `./run-web.sh`.
 
+You will also need to add an `/etc/hosts` entry to reroute `ctf.kaf.sh` to `localhost`.
+
 ### Some very important notes:
 
 I used the following links to update some things and get old versions of things:

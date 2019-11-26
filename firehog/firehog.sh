@@ -1,2 +1,2 @@
 #!/bin/bash
-lynx http://firehog.kipodafterfree.com
+lynx http://ctf.kaf.sh:1150

@@ -1,0 +1,15 @@
+
+Start-Date: 2019-12-16  15:00:16
+Commandline: apt-get install -y g++ make --no-install-recommends --no-install-suggests
+Install: libmpc3:amd64 (1.1.0-1, automatic), libmpx2:amd64 (8.3.0-6, automatic), linux-libc-dev:amd64 (4.19.67-2+deb10u2, automatic), libmpfr6:amd64 (4.0.2-1, automatic), libc6-dev:amd64 (2.28-10, automatic), cpp-8:amd64 (8.3.0-6, automatic), binutils:amd64 (2.31.1-16, automatic), cpp:amd64 (4:8.3.0-1, automatic), libitm1:amd64 (8.3.0-6, automatic), g++:amd64 (4:8.3.0-1), gcc:amd64 (4:8.3.0-1, automatic), libasan5:amd64 (8.3.0-6, automatic), libquadmath0:amd64 (8.3.0-6, automatic), libisl19:amd64 (0.20-2, automatic), binutils-x86-64-linux-gnu:amd64 (2.31.1-16, automatic), libgcc-8-dev:amd64 (8.3.0-6, automatic), libtsan0:amd64 (8.3.0-6, automatic), libubsan1:amd64 (8.3.0-6, automatic), g++-8:amd64 (8.3.0-6, automatic), make:amd64 (4.2.1-1.2), gcc-8:amd64 (8.3.0-6, automatic), liblsan0:amd64 (8.3.0-6, automatic), libgomp1:amd64 (8.3.0-6, automatic), binutils-common:amd64 (2.31.1-16, automatic), libc-dev-bin:amd64 (2.28-10, automatic), libbinutils:amd64 (2.31.1-16, automatic), libatomic1:amd64 (8.3.0-6, automatic), libcc1-0:amd64 (8.3.0-6, automatic), libstdc++-8-dev:amd64 (8.3.0-6, automatic)
+End-Date: 2019-12-16  15:00:22
+
+Start-Date: 2019-12-16  15:01:31
+Commandline: apt-get purge -y g++ make
+Purge: g++:amd64 (4:8.3.0-1), make:amd64 (4.2.1-1.2)
+End-Date: 2019-12-16  15:01:32
+
+Start-Date: 2019-12-16  15:01:33
+Commandline: apt-get autoremove -y
+Remove: libmpc3:amd64 (1.1.0-1), libmpx2:amd64 (8.3.0-6), linux-libc-dev:amd64 (4.19.67-2+deb10u2), libmpfr6:amd64 (4.0.2-1), libc6-dev:amd64 (2.28-10), cpp-8:amd64 (8.3.0-6), binutils:amd64 (2.31.1-16), cpp:amd64 (4:8.3.0-1), libitm1:amd64 (8.3.0-6), gcc:amd64 (4:8.3.0-1), libasan5:amd64 (8.3.0-6), libquadmath0:amd64 (8.3.0-6), libisl19:amd64 (0.20-2), binutils-x86-64-linux-gnu:amd64 (2.31.1-16), libgcc-8-dev:amd64 (8.3.0-6), libtsan0:amd64 (8.3.0-6), libubsan1:amd64 (8.3.0-6), g++-8:amd64 (8.3.0-6), gcc-8:amd64 (8.3.0-6), liblsan0:amd64 (8.3.0-6), libgomp1:amd64 (8.3.0-6), binutils-common:amd64 (2.31.1-16), libc-dev-bin:amd64 (2.28-10), libbinutils:amd64 (2.31.1-16), libatomic1:amd64 (8.3.0-6), libcc1-0:amd64 (8.3.0-6), libstdc++-8-dev:amd64 (8.3.0-6)
+End-Date: 2019-12-16  15:01:34

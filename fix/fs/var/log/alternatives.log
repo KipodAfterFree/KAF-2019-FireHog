@@ -1,0 +1,20 @@
+update-alternatives 2019-12-16 15:00:22: run with --quiet --install /lib/cpp cpp /usr/bin/cpp 10
+update-alternatives 2019-12-16 15:00:22: link group cpp updated to point to /usr/bin/cpp
+update-alternatives 2019-12-16 15:00:22: run with --quiet --install /usr/bin/cc cc /usr/bin/gcc 20
+update-alternatives 2019-12-16 15:00:22: link group cc updated to point to /usr/bin/gcc
+update-alternatives 2019-12-16 15:00:22: run with --quiet --install /usr/bin/c89 c89 /usr/bin/c89-gcc 20 --slave /usr/share/man/man1/c89.1.gz c89.1.gz /usr/share/man/man1/c89-gcc.1.gz
+update-alternatives 2019-12-16 15:00:22: link group c89 updated to point to /usr/bin/c89-gcc
+update-alternatives 2019-12-16 15:00:22: run with --quiet --install /usr/bin/c99 c99 /usr/bin/c99-gcc 20 --slave /usr/share/man/man1/c99.1.gz c99.1.gz /usr/share/man/man1/c99-gcc.1.gz
+update-alternatives 2019-12-16 15:00:22: link group c99 updated to point to /usr/bin/c99-gcc
+update-alternatives 2019-12-16 15:00:22: run with --install /usr/bin/c++ c++ /usr/bin/g++ 20
+update-alternatives 2019-12-16 15:00:22: link group c++ updated to point to /usr/bin/g++
+update-alternatives 2019-12-16 15:01:31: run with --remove c++ /usr/bin/g++
+update-alternatives 2019-12-16 15:01:31: link group c++ fully removed
+update-alternatives 2019-12-16 15:01:33: run with --quiet --remove cc /usr/bin/gcc
+update-alternatives 2019-12-16 15:01:33: link group cc fully removed
+update-alternatives 2019-12-16 15:01:33: run with --quiet --remove c89 /usr/bin/c89-gcc
+update-alternatives 2019-12-16 15:01:33: link group c89 fully removed
+update-alternatives 2019-12-16 15:01:33: run with --quiet --remove c99 /usr/bin/c99-gcc
+update-alternatives 2019-12-16 15:01:33: link group c99 fully removed
+update-alternatives 2019-12-16 15:01:33: run with --quiet --remove cpp /usr/bin/cpp
+update-alternatives 2019-12-16 15:01:33: link group cpp fully removed

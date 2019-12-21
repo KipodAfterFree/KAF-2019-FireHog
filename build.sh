@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-docker build firehog -t firehog-fix
+docker build fix -t firehog-browser
 docker build web -t firehog-server

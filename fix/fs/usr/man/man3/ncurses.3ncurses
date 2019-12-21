@@ -1,0 +1,635 @@
+'\" t
+.\" $Id: ncurses.3x,v 1.23 1998/02/15 02:05:44 tom Exp $
+.TH ncurses 3NCURSES ""
+.ds n 5
+.ds d /usr/share/terminfo
+.SH NAME
+\fBncurses\fR - CRT screen handling and optimization package
+.SH SYNOPSIS
+\fB#include <curses.h>\fR
+.br
+.SH DESCRIPTION
+The \fBcurses\fR library routines give the user a terminal-independent method
+of updating character screens with reasonable optimization.  This
+implementation is ``new curses'' (ncurses) and is the approved replacement for
+4.4BSD classic curses, which has been discontinued.
+
+The \fBncurses\fR routines emulate the \fBncurses\fR(3NCURSES) library of System V
+Release 4 UNIX, and the XPG4 curses standard (XSI curses) but the \fBncurses\fR
+library is freely redistributable in source form.  Differences from the SVr4
+curses are summarized under the EXTENSIONS and BUGS sections below and
+described in detail in the EXTENSIONS and BUGS sections of individual man
+pages.
+
+A program using these routines must be linked with the \fB-lncurses\fR option,
+or (if it has been generated) with the debugging library \fB-lncurses_g\fR. 
+(Your system integrator may also have installed these libraries under
+the names \fB-lcurses\fR and \fB-lcurses_g\fR.)
+The ncurses_g library generates trace logs (in a file called 'trace' in the
+current directory) that describe curses actions.
+
+The \fBncurses\fR package supports: overall screen, window and pad
+manipulation; output to windows and pads; reading terminal input; control over
+terminal and \fBcurses\fR input and output options; environment query
+routines; color manipulation; use of soft label keys; terminfo capabilities;
+and access to low-level terminal-manipulation routines.
+
+To initialize the routines, the routine \fBinitscr\fR or \fBnewterm\fR
+must be called before any of the other routines that deal with windows
+and screens are used.  The routine \fBendwin\fR must be called before
+exiting.  To get character-at-a-time input without echoing (most
+interactive, screen oriented programs want this), the following
+sequence should be used:
+
+      \fBinitscr(); cbreak(); noecho();\fR
+
+Most programs would additionally use the sequence:
+
+      \fBnonl();\fR
+      \fBintrflush(stdscr, FALSE);\fR
+      \fBkeypad(stdscr, TRUE);\fR
+
+Before a \fBcurses\fR program is run, the tab stops of the terminal
+should be set and its initialization strings, if defined, must be
+output.  This can be done by executing the \fBtput init\fR command
+after the shell environment variable \fBTERM\fR has been exported.
+\fBtset(1)\fR is usually responsible for doing this.
+[See \fBterminfo\fR(\*n) for further details.]
+
+The \fBcurses\fR library permits manipulation of data structures,
+called \fIwindows\fR, which can be thought of as two-dimensional
+arrays of characters representing all or part of a CRT screen.  A
+default window called \fBstdscr\fR, which is the size of the terminal
+screen, is supplied.  Others may be created with \fBnewwin\fR.
+
+Note that \fBcurses\fR does not handle overlapping windows, that's done by
+the \fBpanel\fR(3CURSES) library. This means that you can either use
+\fBstdscr\fR or divide the screen into tiled windows and not using
+\fBstdscr\fR at all. Mixing the two will result in unpredictable, and
+undesired, effects.
+
+Windows are referred to by variables declared as \fBWINDOW *\fR.
+These data structures are manipulated with routines described here and
+elsewhere in the \fBncurses\fR manual pages.  Among which the most basic
+routines are \fBmove\fR and \fBaddch\fR.  More general versions of
+these routines are included with names beginning with \fBw\fR,
+allowing the user to specify a window.  The routines not beginning
+with \fBw\fR affect \fBstdscr\fR.)
+
+After using routines to manipulate a window, \fBrefresh\fR is called,
+telling \fBcurses\fR to make the user's CRT screen look like
+\fBstdscr\fR.  The characters in a window are actually of type
+\fBchtype\fR, (character and attribute data) so that other information
+about the character may also be stored with each character.
+
+Special windows called \fIpads\fR may also be manipulated.  These are windows
+which are not constrained to the size of the screen and whose contents need not
+be completely displayed.  See \fBpad\fR(3NCURSES) for more information.
+
+In addition to drawing characters on the screen, video attributes and colors
+may be supported, causing the characters to show up in such modes as
+underlined, in reverse video, or in color on terminals that support such
+display enhancements.  Line drawing characters may be specified to be output.
+On input, \fBcurses\fR is also able to translate arrow and function keys that
+transmit escape sequences into single values.  The video attributes, line
+drawing characters, and input values use names, defined in \fB<curses.h>\fR,
+such as \fBA_REVERSE\fR, \fBACS_HLINE\fR, and \fBKEY_LEFT\fR.
+
+If the environment variables \fBLINES\fR and \fBCOLUMNS\fR are set, or if the
+program is executing in a window environment, line and column information in
+the environment will override information read by \fIterminfo\fR.  This would
+effect a program running in an AT&T 630 layer, for example, where the size of a
+screen is changeable.
+
+If the environment variable \fBTERMINFO\fR is defined, any program using
+\fBcurses\fR checks for a local terminal definition before checking in the
+standard place.  For example, if \fBTERM\fR is set to \fBatt4424\fR, then the
+compiled terminal definition is found in
+
+      \fB\*d/a/att4424\fR.
+
+(The \fBa\fR is copied from the first letter of \fBatt4424\fR to avoid
+creation of huge directories.)  However, if \fBTERMINFO\fR is set to
+\fB$HOME/myterms\fR, \fBcurses\fR first checks
+
+      \fB$HOME/myterms/a/att4424\fR,
+
+and if that fails, it then checks
+
+      \fB\*d/a/att4424\fR.
+
+This is useful for developing experimental definitions or when write
+permission in \fB\*d\fR is not available.
+
+The integer variables \fBLINES\fR and \fBCOLS\fR are defined in
+\fB<curses.h>\fR and will be filled in by \fBinitscr\fR with the size of the
+screen.  The constants \fBTRUE\fR and \fBFALSE\fR have the values \fB1\fR and
+\fB0\fR, respectively.
+
+The \fBcurses\fR routines also define the \fBWINDOW *\fR variable \fBcurscr\fR
+which is used for certain low-level operations like clearing and redrawing a
+screen containing garbage.  The \fBcurscr\fR can be used in only a few
+routines.
+
+.SS Routine and Argument Names
+Many \fBcurses\fR routines have two or more versions.  The routines prefixed
+with \fBw\fR require a window argument.  The routines prefixed with \fBp\fR
+require a pad argument.  Those without a prefix generally use \fBstdscr\fR.
+
+The routines prefixed with \fBmv\fR require a \fIy\fR and \fIx\fR
+coordinate to move to before performing the appropriate action.  The
+\fBmv\fR routines imply a call to \fBmove\fR before the call to the
+other routine.  The coordinate \fIy\fR always refers to the row (of
+the window), and \fIx\fR always refers to the column.  The upper
+left-hand corner is always (0,0), not (1,1).
+
+The routines prefixed with \fBmvw\fR take both a window argument and
+\fIx\fR and \fIy\fR coordinates.  The window argument is always
+specified before the coordinates.
+
+In each case, \fIwin\fR is the window affected, and \fIpad\fR is the
+pad affected; \fIwin\fR and \fIpad\fR are always pointers to type
+\fBWINDOW\fR.
+
+Option setting routines require a Boolean flag \fIbf\fR with the value
+\fBTRUE\fR or \fBFALSE\fR; \fIbf\fR is always of type \fBbool\fR.  The
+variables \fIch\fR and \fIattrs\fR below are always of type
+\fBchtype\fR.  The types \fBWINDOW\fR, \fBSCREEN\fR, \fBbool\fR, and
+\fBchtype\fR are defined in \fB<curses.h>\fR.  The type \fBTERMINAL\fR
+is defined in \fB<term.h>\fR.  All other arguments are integers.
+
+.SS Routine Name Index
+The following table lists each \fBcurses\fR routine and the name of
+the manual page on which it is described.  Routines flagged with `*'
+are ncurses-specific, not described by XPG4 or present in SVr4.
+
+.TS
+center tab(/);
+l l
+l l .
+\fBcurses\fR Routine Name/Manual Page Name
+=
+addch/\fBaddch\fR(3NCURSES)
+addchnstr/\fBaddchstr\fR(3NCURSES)
+addchstr/\fBaddchstr\fR(3NCURSES)
+addnstr/\fBaddstr\fR(3NCURSES)
+addstr/\fBaddstr\fR(3NCURSES)
+attroff/\fBattr\fR(3NCURSES)
+attron/\fBattr\fR(3NCURSES)
+attrset/\fBattr\fR(3NCURSES)
+baudrate/\fBtermattrs\fR(3NCURSES)
+beep/\fBbeep\fR(3NCURSES)
+bkgd/\fBbkgd\fR(3NCURSES)
+bkgdset/\fBbkgd\fR(3NCURSES)
+border/\fBborder\fR(3NCURSES)
+box/\fBborder\fR(3NCURSES)
+can_change_color/\fBcolor\fR(3NCURSES)
+cbreak/\fBinopts\fR(3NCURSES)
+clear/\fBclear\fR(3NCURSES)
+clearok/\fBoutopts\fR(3NCURSES)
+clrtobot/\fBclear\fR(3NCURSES)
+clrtoeol/\fBclear\fR(3NCURSES)
+color_content/\fBcolor\fR(3NCURSES)
+copywin/\fBoverlay\fR(3NCURSES)
+curs_set/\fBkernel\fR(3NCURSES)
+def_prog_mode/\fBkernel\fR(3NCURSES)
+def_shell_mode/\fBkernel\fR(3NCURSES)
+define_key/\fBdefine_key\fR(3NCURSES)*
+del_curterm/\fBterminfo\fR(3NCURSES)
+delay_output/\fButil\fR(3NCURSES)
+delch/\fBdelch\fR(3NCURSES)
+deleteln/\fBdeleteln\fR(3NCURSES)
+delscreen/\fBinitscr\fR(3NCURSES)
+delwin/\fBwindow\fR(3NCURSES)
+derwin/\fBwindow\fR(3NCURSES)
+doupdate/\fBrefresh\fR(3NCURSES)
+dupwin/\fBwindow\fR(3NCURSES)
+echo/\fBinopts\fR(3NCURSES)
+echochar/\fBaddch\fR(3NCURSES)
+endwin/\fBinitscr\fR(3NCURSES)
+erase/\fBclear\fR(3NCURSES)
+erasechar/\fBtermattrs\fR(3NCURSES)
+filter/\fButil\fR(3NCURSES)
+flash/\fBbeep\fR(3NCURSES)
+flushinp/\fButil\fR(3NCURSES)
+getbegyx/\fBgetyx\fR(3NCURSES)
+getch/\fBgetch\fR(3NCURSES)
+getmaxyx/\fBgetyx\fR(3NCURSES)
+getmouse/\fBmouse\fR(3NCURSES)*
+getparyx/\fBgetyx\fR(3NCURSES)
+getstr/\fBgetstr\fR(3NCURSES)
+getsyx/\fBkernel\fR(3NCURSES)
+getwin/\fButil\fR(3NCURSES)
+getyx/\fBgetyx\fR(3NCURSES)
+halfdelay/\fBinopts\fR(3NCURSES)
+has_colors/\fBcolor\fR(3NCURSES)
+has_ic/\fBtermattrs\fR(3NCURSES)
+has_il/\fBtermattrs\fR(3NCURSES)
+has_key/\fBgetch\fR(3NCURSES)*
+hline/\fBborder\fR(3NCURSES)
+idcok/\fBoutopts\fR(3NCURSES)
+idlok/\fBoutopts\fR(3NCURSES)
+immedok/\fBoutopts\fR(3NCURSES)
+inch/\fBinch\fR(3NCURSES)
+inchnstr/\fBinchstr\fR(3NCURSES)
+inchstr/\fBinchstr\fR(3NCURSES)
+init_color/\fBcolor\fR(3NCURSES)
+init_pair/\fBcolor\fR(3NCURSES)
+initscr/\fBinitscr\fR(3NCURSES)
+innstr/\fBinstr\fR(3NCURSES)
+insch/\fBinsch\fR(3NCURSES)
+insdelln/\fBdeleteln\fR(3NCURSES)
+insertln/\fBdeleteln\fR(3NCURSES)
+insnstr/\fBinsstr\fR(3NCURSES)
+insstr/\fBinsstr\fR(3NCURSES)
+instr/\fBinstr\fR(3NCURSES)
+intrflush/\fBinopts\fR(3NCURSES)
+is_linetouched/\fBtouch\fR(3NCURSES)
+is_wintouched/\fBtouch\fR(3NCURSES)
+isendwin/\fBinitscr\fR(3NCURSES)
+keyname/\fButil\fR(3NCURSES)
+keyok/\fBkeyok\fR(3NCURSES)*
+keypad/\fBinopts\fR(3NCURSES)
+killchar/\fBtermattrs\fR(3NCURSES)
+leaveok/\fBoutopts\fR(3NCURSES)
+longname/\fBtermattrs\fR(3NCURSES)
+mcprint/\fBprint\fR(3NCURSES)*
+meta/\fBinopts\fR(3NCURSES)
+mouseinterval/\fBmouse\fR(3NCURSES)*
+mousemask/\fBmouse\fR(3NCURSES)*
+move/\fBmove\fR(3NCURSES)
+mvaddch/\fBaddch\fR(3NCURSES)
+mvaddchnstr/\fBaddchstr\fR(3NCURSES)
+mvaddchstr/\fBaddchstr\fR(3NCURSES)
+mvaddnstr/\fBaddstr\fR(3NCURSES)
+mvaddstr/\fBaddstr\fR(3NCURSES)
+mvcur/\fBterminfo\fR(3NCURSES)
+mvdelch/\fBdelch\fR(3NCURSES)
+mvderwin/\fBwindow\fR(3NCURSES)
+mvgetch/\fBgetch\fR(3NCURSES)
+mvgetstr/\fBgetstr\fR(3NCURSES)
+mvinch/\fBinch\fR(3NCURSES)
+mvinchnstr/\fBinchstr\fR(3NCURSES)
+mvinchstr/\fBinchstr\fR(3NCURSES)
+mvinnstr/\fBinstr\fR(3NCURSES)
+mvinsch/\fBinsch\fR(3NCURSES)
+mvinsnstr/\fBinsstr\fR(3NCURSES)
+mvinsstr/\fBinsstr\fR(3NCURSES)
+mvinstr/\fBinstr\fR(3NCURSES)
+mvprintw/\fBprintw\fR(3NCURSES)
+mvscanw/\fBscanw\fR(3NCURSES)
+mvwaddch/\fBaddch\fR(3NCURSES)
+mvwaddchnstr/\fBaddchstr\fR(3NCURSES)
+mvwaddchstr/\fBaddchstr\fR(3NCURSES)
+mvwaddnstr/\fBaddstr\fR(3NCURSES)
+mvwaddstr/\fBaddstr\fR(3NCURSES)
+mvwdelch/\fBdelch\fR(3NCURSES)
+mvwgetch/\fBgetch\fR(3NCURSES)
+mvwgetstr/\fBgetstr\fR(3NCURSES)
+mvwin/\fBwindow\fR(3NCURSES)
+mvwinch/\fBinch\fR(3NCURSES)
+mvwinchnstr/\fBinchstr\fR(3NCURSES)
+mvwinchstr/\fBinchstr\fR(3NCURSES)
+mvwinnstr/\fBinstr\fR(3NCURSES)
+mvwinsch/\fBinsch\fR(3NCURSES)
+mvwinsnstr/\fBinsstr\fR(3NCURSES)
+mvwinsstr/\fBinsstr\fR(3NCURSES)
+mvwinstr/\fBinstr\fR(3NCURSES)
+mvwprintw/\fBprintw\fR(3NCURSES)
+mvwscanw/\fBscanw\fR(3NCURSES)
+napms/\fBkernel\fR(3NCURSES)
+newpad/\fBpad\fR(3NCURSES)
+newterm/\fBinitscr\fR(3NCURSES)
+newwin/\fBwindow\fR(3NCURSES)
+nl/\fBoutopts\fR(3NCURSES)
+nocbreak/\fBinopts\fR(3NCURSES)
+nodelay/\fBinopts\fR(3NCURSES)
+noecho/\fBinopts\fR(3NCURSES)
+nonl/\fBoutopts\fR(3NCURSES)
+noqiflush/\fBinopts\fR(3NCURSES)
+noraw/\fBinopts\fR(3NCURSES)
+notimeout/\fBinopts\fR(3NCURSES)
+overlay/\fBoverlay\fR(3NCURSES)
+overwrite/\fBoverlay\fR(3NCURSES)
+pair_content/\fBcolor\fR(3NCURSES)
+pechochar/\fBpad\fR(3NCURSES)
+pnoutrefresh/\fBpad\fR(3NCURSES)
+prefresh/\fBpad\fR(3NCURSES)
+printw/\fBprintw\fR(3NCURSES)
+putp/\fBterminfo\fR(3NCURSES)
+putwin/\fButil\fR(3NCURSES)
+qiflush/\fBinopts\fR(3NCURSES)
+raw/\fBinopts\fR(3NCURSES)
+redrawwin/\fBrefresh\fR(3NCURSES)
+refresh/\fBrefresh\fR(3NCURSES)
+reset_prog_mode/\fBkernel\fR(3NCURSES)
+reset_shell_mode/\fBkernel\fR(3NCURSES)
+resetty/\fBkernel\fR(3NCURSES)
+resizeterm/\fBresizeterm\fR(3NCURSES)*
+restartterm/\fBterminfo\fR(3NCURSES)
+ripoffline/\fBkernel\fR(3NCURSES)
+savetty/\fBkernel\fR(3NCURSES)
+scanw/\fBscanw\fR(3NCURSES)
+scr_dump/\fBscr_dump\fR(3NCURSES)
+scr_init/\fBscr_dump\fR(3NCURSES)
+scr_restore/\fBscr_dump\fR(3NCURSES)
+scr_set/\fBscr_dump\fR(3NCURSES)
+scrl/\fBscroll\fR(3NCURSES)
+scroll/\fBscroll\fR(3NCURSES)
+scrollok/\fBoutopts\fR(3NCURSES)
+set_curterm/\fBterminfo\fR(3NCURSES)
+set_term/\fBinitscr\fR(3NCURSES)
+setscrreg/\fBoutopts\fR(3NCURSES)
+setsyx/\fBkernel\fR(3NCURSES)
+setterm/\fBterminfo\fR(3NCURSES)
+setupterm/\fBterminfo\fR(3NCURSES)
+slk_attr/\fBslk\fR(3NCURSES)*
+slk_attroff/\fBslk\fR(3NCURSES)
+slk_attron/\fBslk\fR(3NCURSES)
+slk_attrset/\fBslk\fR(3NCURSES)
+slk_clear/\fBslk\fR(3NCURSES)
+slk_init/\fBslk\fR(3NCURSES)
+slk_label/\fBslk\fR(3NCURSES)
+slk_noutrefresh/\fBslk\fR(3NCURSES)
+slk_refresh/\fBslk\fR(3NCURSES)
+slk_restore/\fBslk\fR(3NCURSES)
+slk_set/\fBslk\fR(3NCURSES)
+slk_touch/\fBslk\fR(3NCURSES)
+standend/\fBattr\fR(3NCURSES)
+standout/\fBattr\fR(3NCURSES)
+start_color/\fBcolor\fR(3NCURSES)
+subpad/\fBpad\fR(3NCURSES)
+subwin/\fBwindow\fR(3NCURSES)
+syncok/\fBwindow\fR(3NCURSES)
+termattrs/\fBtermattrs\fR(3NCURSES)
+termname/\fBtermattrs\fR(3NCURSES)
+tgetent/\fBtermcap\fR(3NCURSES)
+tgetflag/\fBtermcap\fR(3NCURSES)
+tgetnum/\fBtermcap\fR(3NCURSES)
+tgetstr/\fBtermcap\fR(3NCURSES)
+tgoto/\fBtermcap\fR(3NCURSES)
+tigetflag/\fBterminfo\fR(3NCURSES)
+tigetnum/\fBterminfo\fR(3NCURSES)
+tigetstr/\fBterminfo\fR(3NCURSES)
+timeout/\fBinopts\fR(3NCURSES)
+touchline/\fBtouch\fR(3NCURSES)
+touchwin/\fBtouch\fR(3NCURSES)
+tparm/\fBterminfo\fR(3NCURSES)
+tputs/\fBtermcap\fR(3NCURSES)
+tputs/\fBterminfo\fR(3NCURSES)
+typeahead/\fBinopts\fR(3NCURSES)
+unctrl/\fButil\fR(3NCURSES)
+ungetch/\fBgetch\fR(3NCURSES)
+ungetmouse/\fBmouse\fR(3NCURSES)*
+untouchwin/\fBtouch\fR(3NCURSES)
+use_default_colors/\fBdft_fgbg\fR(3NCURSES)*
+use_env/\fButil\fR(3NCURSES)
+vidattr/\fBterminfo\fR(3NCURSES)
+vidputs/\fBterminfo\fR(3NCURSES)
+vline/\fBborder\fR(3NCURSES)
+vwprintw/\fBprintw\fR(3NCURSES)
+vwscanw/\fBscanw\fR(3NCURSES)
+waddch/\fBaddch\fR(3NCURSES)
+waddchnstr/\fBaddchstr\fR(3NCURSES)
+waddchstr/\fBaddchstr\fR(3NCURSES)
+waddnstr/\fBaddstr\fR(3NCURSES)
+waddstr/\fBaddstr\fR(3NCURSES)
+wattroff/\fBattr\fR(3NCURSES)
+wattron/\fBattr\fR(3NCURSES)
+wattrset/\fBattr\fR(3NCURSES)
+wbkgd/\fBbkgd\fR(3NCURSES)
+wbkgdset/\fBbkgd\fR(3NCURSES)
+wborder/\fBborder\fR(3NCURSES)
+wclear/\fBclear\fR(3NCURSES)
+wclrtobot/\fBclear\fR(3NCURSES)
+wclrtoeol/\fBclear\fR(3NCURSES)
+wcursyncup/\fBwindow\fR(3NCURSES)
+wdelch/\fBdelch\fR(3NCURSES)
+wdeleteln/\fBdeleteln\fR(3NCURSES)
+wechochar/\fBaddch\fR(3NCURSES)
+wenclose/\fBmouse\fR(3NCURSES)*
+werase/\fBclear\fR(3NCURSES)
+wgetch/\fBgetch\fR(3NCURSES)
+wgetnstr/\fBgetstr\fR(3NCURSES)
+wgetstr/\fBgetstr\fR(3NCURSES)
+whline/\fBborder\fR(3NCURSES)
+winch/\fBinch\fR(3NCURSES)
+winchnstr/\fBinchstr\fR(3NCURSES)
+winchstr/\fBinchstr\fR(3NCURSES)
+winnstr/\fBinstr\fR(3NCURSES)
+winsch/\fBinsch\fR(3NCURSES)
+winsdelln/\fBdeleteln\fR(3NCURSES)
+winsertln/\fBdeleteln\fR(3NCURSES)
+winsnstr/\fBinsstr\fR(3NCURSES)
+winsstr/\fBinsstr\fR(3NCURSES)
+winstr/\fBinstr\fR(3NCURSES)
+wmove/\fBmove\fR(3NCURSES)
+wnoutrefresh/\fBrefresh\fR(3NCURSES)
+wprintw/\fBprintw\fR(3NCURSES)
+wredrawln/\fBrefresh\fR(3NCURSES)
+wrefresh/\fBrefresh\fR(3NCURSES)
+wresize/\fBwresize\fR(3NCURSES)*
+wscanw/\fBscanw\fR(3NCURSES)
+wscrl/\fBscroll\fR(3NCURSES)
+wsetscrreg/\fBoutopts\fR(3NCURSES)
+wstandend/\fBattr\fR(3NCURSES)
+wstandout/\fBattr\fR(3NCURSES)
+wsyncdown/\fBwindow\fR(3NCURSES)
+wsyncup/\fBwindow\fR(3NCURSES)
+wtimeout/\fBinopts\fR(3NCURSES)
+wtouchln/\fBtouch\fR(3NCURSES)
+wvline/\fBborder\fR(3NCURSES)
+.TE
+.SH RETURN VALUE
+Routines that return an integer return \fBERR\fR upon failure and an
+integer value other than \fBERR\fR upon successful completion, unless
+otherwise noted in the routine descriptions.
+
+All macros return the value of the \fBw\fR version, except \fBsetscrreg\fR,
+\fBwsetscrreg\fR, \fBgetyx\fR, \fBgetbegyx\fR, \fBgetmaxyx\fR.  The return
+values of \fBsetscrreg\fR, \fBwsetscrreg\fR, \fBgetyx\fR, \fBgetbegyx\fR, and
+\fBgetmaxyx\fR are undefined (\fIi\fR.\fIe\fR., these should not be used as the
+right-hand side of assignment statements).
+
+Routines that return pointers return \fBNULL\fR on error.
+.SH SEE ALSO
+\fBterminfo\fR(\*n) and 3X pages whose names begin "curs_" for detailed routine
+descriptions.
+.SH EXTENSIONS
+The \fBcurses\fR library can be compiled with an option (\fB-DTERMCAP_FILE\fR)
+that falls back to the old-style /etc/termcap file if the terminal setup code
+cannot find a terminfo entry corresponding to \fBTERM\fR.  Use of this feature
+is not recommended, as it essentially includes an entire termcap compiler in
+the \fBcurses\fR startup code, at significant cost in core and startup cycles.
+
+Compiling with \fB-DTERMCAP_FILE\fR changes the library's initialization
+sequence in a way intended to mimic the behavior of 4.4BSD curses.  If there is
+no local or system terminfo entry matching \fBTERM\fR, then the library looks
+for termcap entries in the following places: (1) if \fBTERMINFO\fR is
+undefined, in the file named by \fBTERMCAP_FILE\fR; (2) if \fBTERMINFO\fR is
+defined and begins with a slash, it is interpreted as the name of a termcap
+file to search for \fBTERM\fR; (3) otherwise, if \fBTERMINFO\fR has a leading
+string that looks like a terminal entry name list, and it matches \fBTERM\fR,
+the contents of \fBTERMINFO\fR is interpreted as a termcap; (4) if
+\fBTERMINFO\fR looks like a termcap but doesn't match \fBTERM\fR, the termcap
+file is searched for among the colon-separated paths in the environment
+variable \fBTERMPATHS\fR if that is defined, and in ~/.termcap and the file
+value of \fBTERMCAP_FILE\fR otherwise.
+
+Versions of \fBcurses\fR compiled on PC clones support display of the PC ROM
+characters (including ROM characters 0-31, which stock SVr4 curses cannot
+display). See the EXTENSIONS sections of \fBaddch\fR(3NCURSES) and
+\fBattr\fR(3NCURSES).
+
+The \fBcurses\fR library includes facilities for capturing mouse events on
+certain terminals (including xterm). See the \fBmouse\fR(3NCURSES)
+manual page for details.
+
+The \fBcurses\fR library includes a function for directing application output
+to a printer attached to the terminal device.  See the \fBprint\fR(3NCURSES)
+manual page for details.
+.SH PORTABILITY
+The \fBcurses\fR library is intended to be BASE-level conformant with the XSI
+Curses standard.  Certain portions of the EXTENDED XSI Curses functionality
+(including color support) are supported.  The following EXTENDED XSI Curses
+calls in support of wide (multibyte) characters are not yet implemented:
+\fBaddnwstr\fB,
+\fBaddwstr\fB,
+\fBmvaddnwstr\fB,
+\fBmvwaddnwstr\fB,
+\fBmvaddwstr\fB,
+\fBwaddnwstr\fB,
+\fBwaddwstr\fB,
+\fBadd_wch\fB,
+\fBwadd_wch\fB,
+\fBmvadd_wch\fB,
+\fBmvwadd_wch\fB,
+\fBadd_wchnstr\fB,
+\fBadd_wchstr\fB,
+\fBwadd_wchnstr\fB,
+\fBwadd_wchstr\fB,
+\fBmvadd_wchnstr\fB,
+\fBmvadd_wchstr\fB,
+\fBmvwadd_wchnstr\fB,
+\fBmvwadd_wchstr\fB,
+\fBbkgrndset\fB,
+\fBbkgrnd\fB,
+\fBgetbkgrnd\fB,
+\fBwbkgrnd\fB,
+\fBwbkgrndset\fB,
+\fBwgetbkgrnd\fB,
+\fBborder_set\fB,
+\fBwborder_set\fB,
+\fBbox_set\fB,
+\fBhline_set\fB,
+\fBmvhline_set\fB,
+\fBmvvline_set\fB,
+\fBmvwhline_set\fB,
+\fBmvwvline_set\fB,
+\fBwhline_set\fB,
+\fBvhline_set\fB,
+\fBwvline_set\fB,
+\fBecho_wchar\fB,
+\fBwecho_wchar\fB,
+\fBerasewchar\fB,
+\fBkillwchar\fB,
+\fBget_wch\fB,
+\fBmvget_wch\fB,
+\fBmvwget_ch\fB,
+\fBwget_wch\fB,
+\fBgetwchtype\fB,
+\fBget_wstr\fB,
+\fBgetn_wstr\fB,
+\fBwget_wstr\fB,
+\fBwgetn_wstr\fB,
+\fBmvget_wstr\fB,
+\fBmvgetn_wstr\fB,
+\fBmvwget_wstr\fB,
+\fBmvwgetn_wstr\fB,
+\fBinnwstr\fB,
+\fBinwstr\fB,
+\fBwinnwstr\fB,
+\fBwinwstr\fB,
+\fBmvinnwstr\fB,
+\fBmvinwstr\fB,
+\fBmvwinnwstr\fB,
+\fBmvwinwstr\fB,
+\fBins_nwstr\fB,
+\fBins_wstr\fB,
+\fBmvins_nwstr\fB,
+\fBmvins_wstr\fB,
+\fBmvwins_nwstr\fB,
+\fBmvwins_wstr\fB,
+\fBwins_nwstr\fB,
+\fBwins_wstr\fB,
+\fBins_wch\fB,
+\fBwins_wch\fB,
+\fBmvins_wch\fB,
+\fBmvwins_wch\fB,
+\fBin_wch\fB,
+\fBwin_wch\fB,
+\fBmvin_wch\fB,
+\fBmvwin_wch\fB,
+\fBinwchstr\fB,
+\fBinwchnstr\fB,
+\fBwinwchstr\fB,
+\fBwinwchnstr\fB,
+\fBmvinwchstr\fB,
+\fBmvinwchnstr\fB,
+\fBmvinwchstr\fB,
+\fBmvwinwchnstr\fB.
+.PP
+A small number of local differences (that is, individual differences between
+the XSI Curses and \fBcurses\fR calls) are described in \fBPORTABILITY\fR
+sections of the library man pages.
+.PP
+The routine \fBhas_key\fR is not part of XPG4, nor is it present in SVr4.  See
+the \fBgetch\fR(3NCURSES) manual page for details.
+.PP
+The routine \fBslk_attr\fR is not part of XPG4, nor is it present in SVr4.  See
+the \fBslk\fR(3NCURSES) manual page for details.
+.PP
+The routines \fBgetmouse\fR, \fBmousemask\fR, \fBungetmouse\fR,
+\fBmouseinterval\fR, and \fBwenclose\fR relating to mouse interfacing are not
+part of XPG4, nor are they present in SVr4.  See the \fBmouse\fR(3NCURSES)
+manual page for details.
+.PP
+The routine \fBmcprint\fR was not present in any previous curses
+implementation.  See the \fBprint\fR(3NCURSES) manual page for details.
+.PP
+The routine \fBwresize\fR is not part of XPG4, nor is it present in SVr4.  See
+the \fBwresize\fR(3NCURSES) manual page for details.
+.PP
+In historic curses versions, delays embedded in the capabilities \fBcr\fR,
+\fBind\fR, \fBcub1\fR, \fBff\fR and \fBtab\fR activated corresponding delay
+bits in the UNIX tty driver.  In this implementation, all padding is done by
+NUL sends.  This method is slightly more expensive, but narrows the interface
+to the UNIX kernel significantly and increases the package's portability
+correspondingly.
+.PP
+In the XSI standard and SVr4 manual pages, many entry points have prototype
+arguments of the for \fBchar *const\fR (or \fBcchar_t *const\fR, or \fBwchar_t
+*const\fR, or \fBvoid *const\fR).  Depending on one's interpretation of the
+ANSI C standard (see section 3.5.4.1), these declarations are either (a)
+meaningless, or (b) meaningless and illegal.  The declaration \fBconst char
+*x\fR is a modifiable pointer to unmodifiable data, but \fBchar *const x\fR' is
+an unmodifiable pointer to modifiable data.  Given that C passes arguments by
+value, \fB<type> *const\fR as a formal type is at best dubious.  Some compilers
+choke on the prototypes.  Therefore, in this implementation, they have been
+changed to \fBconst <type> *\fR globally.
+.SH NOTES
+The header file \fB<curses.h>\fR automatically includes the header files
+\fB<stdio.h>\fR and \fB<unctrl.h>\fR.
+
+If standard output from a \fBcurses\fR program is re-directed to something
+which is not a tty, screen updates will be directed to standard error.  This
+was an undocumented feature of AT&T System V Release 3 curses.
+.SH AUTHORS
+Zeyd M. Ben-Halim, Eric S. Raymond.  Descends from the original pcurses
+by Pavel Curtis.
+.\"#
+.\"# The following sets edit modes for GNU EMACS
+.\"# Local Variables:
+.\"# mode:nroff
+.\"# fill-column:79
+.\"# End:
